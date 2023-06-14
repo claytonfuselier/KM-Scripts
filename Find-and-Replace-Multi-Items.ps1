@@ -64,7 +64,7 @@ $pages | ForEach-Object {
 
     if ($edited) {
         # Save the new content
-        $pagecontent | Set-Content -Encoding UTF8 -Path $_.FullName
+        $pagecontent | Set-Content -Encoding UTF8 -LiteralPath $_.FullName
 
         # Console output plus running tally
         Write-Host -ForegroundColor Cyan "Updated $totalmatches Match(es)"
