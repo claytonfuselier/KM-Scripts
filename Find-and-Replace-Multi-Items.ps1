@@ -29,26 +29,16 @@ $scriptstart = Get-Date
 
 # Read CSV file into $csvitems
 Write-Host -ForegroundColor Gray "Reading CSV file..."
-$csvcontent = Import-Csv -LiteralPath $csvpath
-$csvitems = @()
-    
-foreach ($row in $csvcontent) {
-    $oldstring = $row."OldString"
-    $newstring = $row."NewString"
-    $item = [PSCustomObject]@{
-        OldString = $oldstring
-        NewString = $newstring
-    }
-    $csvitems += $item
-}
+$csvitems = Import-Csv -LiteralPath $csvpath | Select-Object -Property @{Name='OldString';Expression={$_.OldString.Trim()}}, @{Name='NewString';Expression={$_.NewString.Trim()}}
 
 # Get pages
-$pages = Get-ChildItem -Path $gitroot -Recurse | where { $_.Extension -eq ".md" }
+$pages = Get-ChildItem -Path $gitroot -Recurse -Filter "*.md" -File
 
 # Parse each page
 $pagecnt = 0
-$totaledits = 0
 $editedpages = 0
+$totaledits = 0
+
 $pages | ForEach-Object {
     # Console output of current page
     Write-Host -ForegroundColor Gray ("$($_.FullName.Replace($gitroot,''))")
@@ -59,12 +49,12 @@ $pages | ForEach-Object {
     # Loop through $csvitems checking for matches in $pagecontent
     $edited = 0
     $totalmatches = 0
+
     $csvitems | ForEach-Object {
-        
         # Counting/Checking for matches
         $matches = ([regex]::Matches($pagecontent, [regex]::Escape($_.OldString), [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)).Count
-        if ($matches -gt 0) {
 
+        if ($matches -gt 0) {
             # Find and replace
             $pagecontent = $pagecontent -ireplace [regex]::Escape($_.OldString), $_.NewString
             $edited = 1
@@ -73,7 +63,6 @@ $pages | ForEach-Object {
     }
 
     if ($edited) {
-
         # Save the new content
         $pagecontent | Set-Content -Encoding UTF8 -Path $_.FullName
 
@@ -85,10 +74,8 @@ $pages | ForEach-Object {
 
     # Progress bar
     $pagecnt++
-    $avg = ((Get-Date) - $scriptstart).TotalMilliseconds / $pagecnt
-    $msleft = (($pages.Count - $pagecnt) * $avg)
-    $time = New-TimeSpan -Seconds ($msleft / 1000)
     $percent = [Math]::Round(($pagecnt / $pages.Count) * 100, 2)
+    $time = New-TimeSpan -Seconds ((Get-Date) - $scriptstart).TotalSeconds * (($pages.Count - $pagecnt) / $pagecnt)
     Write-Progress -Activity "Scanning pages: $percent %" -Status "$pagecnt of $($pages.Count) total pages - $time" -PercentComplete $percent
 }
 
