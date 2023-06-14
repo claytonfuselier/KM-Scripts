@@ -29,7 +29,7 @@ $scriptstart = Get-Date
 
 # Read CSV file into $csvitems
 Write-Host -ForegroundColor Gray "Reading CSV file..."
-$csvitems = Import-Csv -LiteralPath $csvpath | Select-Object -Property @{Name='OldString';Expression={$_.OldString.Trim()}}, @{Name='NewString';Expression={$_.NewString.Trim()}}
+$csvitems = Import-Csv -Path $csvpath | Select-Object -Property @{Name='OldString';Expression={$_.OldString.Trim()}}, @{Name='NewString';Expression={$_.NewString.Trim()}}
 
 # Get pages
 $pages = Get-ChildItem -Path $gitroot -Recurse -Filter "*.md" -File
@@ -74,8 +74,10 @@ $pages | ForEach-Object {
 
     # Progress bar
     $pagecnt++
+    $avg = ((Get-Date) - $scriptstart).TotalMilliseconds / $pagecnt
+    $msleft = (($pages.Count - $pagecnt) * $avg)
+    $time = New-TimeSpan -Seconds ($msleft / 1000)
     $percent = [Math]::Round(($pagecnt / $pages.Count) * 100, 2)
-    $time = New-TimeSpan -Seconds ((Get-Date) - $scriptstart).TotalSeconds * (($pages.Count - $pagecnt) / $pagecnt)
     Write-Progress -Activity "Scanning pages: $percent %" -Status "$pagecnt of $($pages.Count) total pages - $time" -PercentComplete $percent
 }
 
