@@ -2,13 +2,13 @@
 ##  Summary  ##
 ###############
 # Intended use is on CodeWiki pages in a locally cloned Azure DevOps (or similar local repository).
-# Focus is on parsing .md files for URLs with a certain domain (and/or sub domain) and recording every instance
+# Focus is on parsing .md files for URLs with a certain domain (and/or subdomain) and recording every instance
 # in a CSV. Using a wildcard to find "all" URLs is not (currently) supported; a domain must be provided.
 #
 # Note: The script accounts for plaintext and HTML-encoded URLs, as well as HTTP and HTTPS.
-# Note: Setting $allsubs to "1" will match any sub-domain (relative to $domain), at any depth. 
-#       Example: $domain="example.com" and $allsubs=1, will match on example.com, x.example.com, y.x.example.com, etc.
-#       Example: $domain="sub.example.com" and $allsubs=0, will ONLY match on sub.example.com
+# Note: Setting $allsubs to "1" will match any subdomain (relative to $domain), at any depth. 
+#       Example: $domain="example.com" and $allsubs=1 will match on example.com, x.example.com, y.x.example.com, etc.
+#       Example: $domain="sub.example.com" and $allsubs=0 will ONLY match on sub.example.com
 #
 # Source: https://github.com/claytonfuselier/KM-Scripts/blob/main/Export-Links.ps1
 # Help: https://github.com/claytonfuselier/KM-Scripts/wiki
