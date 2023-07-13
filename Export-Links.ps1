@@ -59,15 +59,14 @@ $pages | ForEach-Object {
 
             # Get all matches in the line (accounts for potentially multiple matches per line)
             $urls = [regex]::Matches($_, $urlRegex, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase).Value
-            if($urls){
-                $urls | ForEach-Object {
-
-                    # Export results
-                    $resultsrow = New-Object psobject
-                    $resultsrow | Add-Member -Type NoteProperty -Name "Path" -Value $pagepath
-                    $resultsrow | Add-Member -Type NoteProperty -Name "PageName" -Value $pagename
-                    $resultsrow | Add-Member -Type NoteProperty -Name "Line Number" -Value $line
-                    $resultsrow | Add-Member -Type NoteProperty -Name "URL" -Value $_
+            if ($urls) {
+                foreach ($url in $urls) {
+                    $resultsrow = [pscustomobject]@{
+                        "Path" = $pagepath
+                        "PageName" = $pagename
+                        "Line Number" = $line
+                        "URL" = $url
+                    }
                     $resultsrow | Export-Csv -Path $exportfile -NoTypeInformation -Append
                     Write-Host -ForegroundColor Yellow "Found Link"
                 }
